@@ -1,0 +1,10 @@
+langchain
+langchain-community
+faiss-cpu
+python-dotenv
+transformers
+sentence-transformers
+bitsandbytes
+mysql-connector-python
+beautifulsoup4
+emoji
