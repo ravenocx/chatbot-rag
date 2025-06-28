@@ -3,7 +3,7 @@ import helpers.cleaning as c
 import json
 import locale
 
-def generate_product_documents(products:list[dict], attributes_data : dict):
+def generate_product_documents(products:list[dict], attributes_data : dict) -> list[Document]:
     return [Document(page_content=product_page_content(product=product, attributes_data=attributes_data), 
                      metadata={
                          "id": product["id"],
@@ -19,7 +19,7 @@ def generate_product_documents(products:list[dict], attributes_data : dict):
                      }) for product in products]
 
 def product_page_content(product:dict, attributes_data : dict) -> str :
-    template = f"""\
+    format = f"""\
 **Product Name** : {product["name"]}
 
 **Description** : {c.clean_html(product["description"])}
@@ -36,7 +36,7 @@ Discount: {format_currency(product.get("discount") or 0)}
 Shipping Fee: {format_currency(product["shipping_fee"])}
 Shipping is available to {format_shipping_country(product["shipping_country"])}.
 """
-    return template
+    return clean_page_content(format)
     
 def format_brand(brand_name: str) -> str:
     if not brand_name :
@@ -92,3 +92,14 @@ def format_currency(price) -> str:
     locale.setlocale(locale.LC_ALL, 'id_ID.UTF-8')
     formatted_price = locale.currency(price, symbol=True, grouping=True)
     return formatted_price
+
+def clean_page_content(page_content: str) -> str :
+    cleaned_whitespace = c.normalize_whitespace(page_content)
+    cleaned_punctuation = c.normalize_punctuation(cleaned_whitespace)
+    cleaned_html_entities = c.decode_html_entities(cleaned_punctuation)
+    cleaned_non_informative_patterns = c.remove_non_informative(cleaned_html_entities)
+    cleaned_emoji = c.remove_emoji(cleaned_non_informative_patterns)
+    cleaned_special_symbols = c.remove_special_symbols(cleaned_emoji)
+    cleaned_text = c.remove_accents(cleaned_special_symbols)
+    
+    return cleaned_text

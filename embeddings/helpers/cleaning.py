@@ -55,7 +55,7 @@ def normalize_whitespace(text: str) -> str :
         A cleaned string with all tabs/newlines replaced by a single space, 
         multiple spaces reduced to one, and leading/trailing spaces removed.
     """ 
-    text = re.sub(r"[\t\r\n]+", " ", text)
+    text = re.sub(r"[\t\r]+", " ", text)
     
     text = re.sub(r" {2,}", " ", text)
     
@@ -76,7 +76,8 @@ def normalize_punctuation(text: str) -> str:
     """
     text = re.sub(r"\s+([.,!?;:])", r"\1", text)
 
-    text = re.sub(r"([.,!?;:])(?=\w)", r"\1 ", text)
+    # Only add space after punctuation if NOT followed by another digit (to avoid breaking numbers)
+    text = re.sub(r"([.,!?;:])(?=[^\d\s])", r"\1 ", text)
 
     text = re.sub(r"([.,!?])\1+", r"\1", text)
 
@@ -134,7 +135,7 @@ def remove_special_symbols(text: str) -> str:
     """
     Removes or replaces specific special characters from the input text.
     - Removes symbols: ~ @ # $ ^ _ \
-    - Replaces epecific brackets {}, [], <> to ()
+    - Replaces epecific brackets {}, [] to ()
 
     Args:
         text: A string that may contain special symbols.
@@ -144,7 +145,7 @@ def remove_special_symbols(text: str) -> str:
     """
     text = re.sub(r"[~@#\$^_\\]", "", text)
 
-    text = re.sub(r"[{}\[\]<>]", "()", text)
+    text = re.sub(r"[{}\[\]]", "()", text)
 
     return text
 
