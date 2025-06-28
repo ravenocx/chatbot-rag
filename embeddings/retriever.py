@@ -9,7 +9,7 @@ from sentence_transformers import SentenceTransformer
 def get_detailed_instruct(task_description: str, query: str) -> str:
     return f'Instruct: {task_description}\nQuery: {query}'
 
-def retrieve(qry, k=5) :
+def retrieve(qry, k=3) :
     load_dotenv()
 
     index = faiss.read_index(os.getenv("INDEX_FILE"))
