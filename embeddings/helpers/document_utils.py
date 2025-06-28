@@ -36,8 +36,7 @@ Maximum purchase quantity: {product.get("maximum_purchase_qty")}
 **Price**: {format_currency(product["price"])}
 Discount: {format_currency(product.get("discount") or 0)}
 Shipping Fee: {format_currency(product["shipping_fee"])}
-Shipping is available to {format_shipping_country(product["shipping_country"])}.
-"""
+Shipping is available to {format_shipping_country(product["shipping_country"])}."""
     return clean_page_content(format)
     
 def format_brand(brand_name: str) -> str:
