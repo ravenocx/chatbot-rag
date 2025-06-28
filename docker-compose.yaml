@@ -12,7 +12,7 @@ services:
       - "3306:3306"
     volumes:
       - mysql-data:/var/lib/mysql
-      - ./data:/docker-entrypoint-initdb.d
+      - ./embeddings/data:/docker-entrypoint-initdb.d
 
   adminer:
     image: adminer

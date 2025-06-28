@@ -5,20 +5,31 @@ import emoji
 import unicodedata
 from bs4 import BeautifulSoup
 
-def json_parse(json_str, lang_code: str) -> str:
+def json_parse(json_str, lang_code: str = "en") -> str:
     """
-    Extracts the value for a given language code from a JSON-formatted multilingual string.
+    Parses a multilingual JSON string and extracts the value for the specified language code.
 
     Args:
-        json_str: A JSON string with language keys (e.g., {"en": "value"} , {"id": "nilai"}).
-        lang_code: The target language code to extract (e.g., "en", "id").
+        json_str: A JSON-formatted string containing language keys (e.g., '{"en": "value"}', '{"id": "nilai"}').
+        lang_code: The preferred language code to extract (default is "en").
 
     Returns:
-        The string value associated with the given language code, or an empty string if not found.
+        The value corresponding to the specified language code.
+        If not found, returns the first available value.
+        Returns an empty string if parsing fails or no valid value is found.
     """
-    data = json.loads(json_str)
-    val = data.get(lang_code, "")
-    return val
+    try:
+        data = json.loads(json_str)
+
+        if lang_code in data:
+            return data[lang_code]
+
+        if isinstance(data, dict):
+            return next(iter(data.values()), "")
+        
+        return ""
+    except (json.JSONDecodeError, TypeError):
+        return ""
 
 def clean_html(html_str: str) -> str:
     """
