@@ -30,6 +30,8 @@ Product "{product["name"]}" falls under the {format_category(product["category_n
 {format_attributes(product["attributes_value"], attributes_data=attributes_data)}
 Weight: {product["weight"]} KG
 Variants available: {product["variant_product"]} option(s)
+Minimum purchase quantity: {product.get("minimum_purchase_qty" or 1)}
+Maximum purchase quantity: {product.get("maximum_purchase_qty")}
 
 **Price**: {format_currency(product["price"])}
 Discount: {format_currency(product.get("discount") or 0)}
