@@ -11,3 +11,4 @@ emoji
 numpy
 fastapi
 uvicorn
+accelerate
