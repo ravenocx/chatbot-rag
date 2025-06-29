@@ -36,7 +36,7 @@ Maximum purchase quantity: {product.get("maximum_purchase_qty")}
 **Price**: {format_currency(product["price"])}
 Discount: {format_currency(product.get("discount") or 0)}
 Shipping Fee: {format_currency(product["shipping_fee"])}
-Shipping is available to {format_shipping_country(product["shipping_country"])}."""
+{format_shipping_country(product["shipping_country"])}."""
     return clean_page_content(format)
     
 def format_brand(brand_name: str) -> str:
@@ -81,13 +81,13 @@ def format_attributes(attributes : str, attributes_data : dict) -> str :
 
 def format_shipping_country(country_str: str) -> str:
     if not country_str :
-        return "Shipping information is currently unavailable."
+        return "Shipping information is currently unavailable"
     try:
         countries = json.loads(country_str)
         shipping_countries = ", ".join(countries)
-        return f"Shipping is available to {shipping_countries}" if isinstance(countries, list) else "Shipping information is currently unavailable."
+        return f"Shipping is available to {shipping_countries}" if isinstance(countries, list) else "Shipping information is currently unavailable"
     except json.JSONDecodeError:
-        return "Shipping information is currently unavailable."
+        return "Shipping information is currently unavailable"
 
 def format_currency(price) -> str:
     locale.setlocale(locale.LC_ALL, 'id_ID.UTF-8')
