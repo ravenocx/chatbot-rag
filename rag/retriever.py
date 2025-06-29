@@ -9,7 +9,7 @@ from sentence_transformers import SentenceTransformer
 def get_detailed_instruct(task_description: str, query: str) -> str:
     return f'Instruct: {task_description}\nQuery: {query}'
 
-def retrieve(qry, k=3) :
+def retrieve_docs(qry, k=3) :
     load_dotenv()
 
     index = faiss.read_index(os.getenv("INDEX_FILE"))
@@ -34,7 +34,7 @@ def retrieve(qry, k=3) :
 
 if __name__ == "__main__":
     query = input("Ask an Query: ")
-    result = retrieve(query)
+    result = retrieve_docs(query)
     for i, item in enumerate(result, 1) : 
         print(f"[{i}] Score : {item['score']}")
         print(f"Data : {item['text']}")

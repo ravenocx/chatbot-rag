@@ -1,6 +1,6 @@
 import torch
 from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig, pipeline
-from retriever import retrieve
+from retriever import retrieve_docs
 
 model_id = "meta-llama/Llama-3.3-70B-Instruct"
 
@@ -18,11 +18,10 @@ model = AutoModelForCausalLM.from_pretrained(model_id,
 
 llm = pipeline("text-generation", model=model, tokenizer=tokenizer)
 
-# prompt to LLM
-def rag_ask(query: str, k=3, max_tokens=1024):
-    # Step 1: Get relevant passages
-    retrieved_docs = retrieve(query, k=k)
-    context = "\n\n".join([f"{i+1}. {doc['text']}" for i, doc in enumerate(retrieved_docs)])
+def generate_response(query: str, k=3, max_tokens=1024):
+    # Get relevant passages
+    docs = retrieve_docs(query, k=k)
+    context = "\n\n".join([f"{i+1}. {doc['text']}" for i, doc in enumerate(docs)])
 
     prompt = f"""You are a highly accurate e-commerce chatbot assistant expert. Your main role is to help customers find product information and provide recommendations based **ONLY** on the provided product data.
 
@@ -45,11 +44,10 @@ ADDITIONAL RESPONSE GUIDELINES:
 
 ANSWER:"""
 
-    # Step 3: Generate answer
     result = llm(prompt, max_new_tokens=max_tokens, do_sample=False)
     return result[0]["generated_text"][len(prompt):].strip()
 
 if __name__ == "__main__":
     query = input("Ask an Query to LLMs: ")
-    result = rag_ask(query)
+    result = generate_response(query)
     print(f"Answer:\n{result}")
