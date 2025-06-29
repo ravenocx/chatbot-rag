@@ -277,29 +277,29 @@ if __name__ == "__main__":
     test_cases = [
         {
             'query_id': 'Q1',
-            'query_text': 'waterproof smartphone under $500',
-            'relevant_docs_idx': [1, 5, 10]  
+            'query_text': 'Berikan saya rekomendasi handphone dengan brand xiaomi',
+            'relevant_docs_idx': [8, 14]  
         },
         {
             'query_id': 'Q2', 
-            'query_text': 'gaming laptop with RTX 4060',
-            'relevant_docs_idx': [1, 5, 10]  
+            'query_text': 'Berikan saya rekomendasi serum dengan diskon terbesar',
+            'relevant_docs_idx': [31, 28, 32]  
         },
         {
             'query_id': 'Q3',
-            'query_text': 'wireless headphones noise cancelling',
-            'relevant_docs_idx': [1, 5, 10] 
+            'query_text': 'Popok bayi dengan harga paling termurah',
+            'relevant_docs_idx': [61, 53, 52, 54, 58] 
         },
         {
             'query_id': 'Q4',
-            'query_text': 'wireless headphones noise cancelling',
-            'relevant_docs_idx': [1, 5, 10] 
+            'query_text': 'Berapa saja kapasitas penyimpanan yang tersedia untuk Iphone 15?',
+            'relevant_docs_idx': [9] 
         },
         {
             'query_id': 'Q5',
-            'query_text': 'wireless headphones noise cancelling',
-            'relevant_docs_idx': [1, 5, 10] 
+            'query_text': 'Apakah produk infinix smart 8 merupakan barang baru?',
+            'relevant_docs_idx': [12] 
         }
     ]
     # Run Unit Test
-    evaluator, metrics = run_unit_tests(unit_tests=test_cases, top_k=3)
+    evaluator, metrics = run_unit_tests(unit_tests=test_cases, top_k=5)
