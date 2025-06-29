@@ -145,7 +145,10 @@ def remove_special_symbols(text: str) -> str:
     """
     text = re.sub(r"[~@#\$^_\\]", "", text)
 
-    text = re.sub(r"[{}\[\]]", "()", text)
+    text = re.sub(r"[{\[]", "(", text)
+
+    text = re.sub(r"[}\]]", ")", text)
+
 
     return text
 

@@ -35,7 +35,7 @@ def status():
 @app.post("/query", response_model=QueryResponse, tags=["Chatbot"])
 def answer_query(payload: QueryRequest):
     try:
-        answer = generate_response(payload.query, k=3, max_tokens=4096) # Change k for top (n) retrieval
+        answer = generate_response(payload.query, k=5, max_tokens=4096) # Change k for top (n) retrieval
         return QueryResponse(query=payload.query, answer=answer)
     except Exception as e:
         print(f"[ERROR] {str(e)}")

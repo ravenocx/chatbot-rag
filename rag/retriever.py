@@ -21,7 +21,7 @@ def load_resources():
 def get_detailed_instruct(task_description: str, query: str) -> str:
     return f'Instruct: {task_description}\nQuery: {query}'
 
-def retrieve_docs(qry, k=3) :
+def retrieve_docs(qry, k=5) :
     load_resources()
 
     task = "Given a user’s product-related query, retrieve the most relevant and informative product descriptions, specifications, or recommendations that directly address the query."
