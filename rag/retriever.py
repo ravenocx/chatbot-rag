@@ -44,7 +44,7 @@ def get_docs(index):
 
 
 if __name__ == "__main__":
-    query = input("Ask an Query: ")
+    query = input("Ask an Query to retrieval : ")
     result = retrieve_docs(query)
     for i, item in enumerate(result, 1) : 
         print(f"[{i}] Score : {item['score']}")

@@ -52,6 +52,6 @@ ANSWER:"""
     return result[0]["generated_text"][len(prompt):].strip()
 
 if __name__ == "__main__":
-    query = input("Ask an Query to LLMs: ")
+    query = input("Ask an Query to generate answer from LLMs: ")
     result = generate_response(query)
     print(f"Answer:\n{result}")
