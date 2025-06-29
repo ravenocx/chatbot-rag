@@ -1,6 +1,6 @@
 import torch
 from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig, pipeline
-from retriever import retrieve_docs
+from rag.retriever import retrieve_docs
 
 model_id = "meta-llama/Llama-3.3-70B-Instruct"
 
@@ -18,7 +18,7 @@ model = AutoModelForCausalLM.from_pretrained(model_id,
 
 llm = pipeline("text-generation", model=model, tokenizer=tokenizer)
 
-def generate_response(query: str, k=3, max_tokens=1024):
+def generate_response(query: str, k=3, max_tokens=4096):
     # Get relevant passages
     docs = retrieve_docs(query, k=k)
     context = "\n\n".join([f"{i+1}. {doc['text']}" for i, doc in enumerate(docs)])
