@@ -9,7 +9,7 @@ login(token=os.getenv("HUGGINGFACE_TOKEN"))
 model_id = "meta-llama/Llama-3.3-70B-Instruct"
 
 bnb_config= BitsAndBytesConfig(
-    load_in_8bit=True,
+    load_in_4bit=True,
     llm_int8_threshold=6.0,
     llm_int8_has_fp16_weight=False
 )
