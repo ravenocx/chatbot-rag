@@ -2,7 +2,7 @@ import torch
 import os
 from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig, pipeline
 from huggingface_hub import login
-from rag.retriever import retrieve_docs
+from retriever import retrieve_docs
 
 login(token=os.getenv("HUGGINGFACE_TOKEN"))
 
