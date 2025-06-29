@@ -14,3 +14,7 @@ uvicorn
 accelerate
 pandas
 evaluate
+nltk
+rouge_score
+absl-py
+bert_score

@@ -3,7 +3,7 @@ import numpy as np
 from typing import List, Dict, Set, Tuple, Optional
 from dataclasses import dataclass
 import pandas as pd
-from rag.retriever import retrieve_docs, get_docs
+from retriever import retrieve_docs, get_docs
 
 @dataclass
 class QueryEvaluation:
@@ -213,8 +213,8 @@ class RAGRetrievalEvaluator:
         print("=" * 60)
         print(f"Total Queries Evaluated: {len(self.evaluations)}\n")
         
-        print(f"PRECISION@K SCORES: {metrics['precision@k']:.4f}\n")
-        print(f"RECALL@K SCORES: {metrics['recall@k']:.4f}\n")
+        print(f"PRECISION@K SCORES: {metrics['Precision@k']:.4f}\n")
+        print(f"RECALL@K SCORES: {metrics['Recall@k']:.4f}\n")
         print(f"MEAN RECIPROCAL RANK (MRR): {metrics['MRR']:.4f}")
         print("=" * 60)
     
@@ -234,7 +234,7 @@ def enrich_docs(unit_tests, top_k):
     enriched_unit_test = []
 
     for ut in unit_tests:
-        retrieved = retrieve_docs(ut['query_text'], top_k=top_k)
+        retrieved = retrieve_docs(ut['query_text'], k=top_k)
         retrieved_texts = [item['text'] for item in retrieved]
 
         enriched_unit_test.append({
@@ -250,7 +250,7 @@ def enrich_docs(unit_tests, top_k):
 
 def run_unit_tests(unit_tests, top_k):
     """Run example evaluation"""
-    print("Running RAG Retrieval Evaluation Example...")
+    print("Running RAG Retrieval Evaluation...")
     print()
     
     # Initialize evaluator

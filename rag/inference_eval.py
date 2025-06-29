@@ -1,6 +1,6 @@
 from typing import List, Dict
 import evaluate
-from rag.inference import generate_response
+from inference import generate_response
 import pandas as pd
 
 

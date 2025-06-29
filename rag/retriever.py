@@ -7,7 +7,7 @@ from sentence_transformers import SentenceTransformer
 def get_detailed_instruct(task_description: str, query: str) -> str:
     return f'Instruct: {task_description}\nQuery: {query}'
 
-def retrieve_docs(qry, k=3) :
+def retrieve_docs(qry, k=5) :
     load_dotenv()
 
     index = faiss.read_index(os.getenv("INDEX_FILE"))
@@ -30,11 +30,11 @@ def retrieve_docs(qry, k=3) :
 
     return [{"text": id_to_doc[i], "score": float(D[0][idx])} for idx, i in enumerate(I[0])]
 
-def get_docs(index):
+def get_docs(indices):
     index = faiss.read_index(os.getenv("INDEX_FILE"))
     with open(os.getenv("CHUNK_FILE"), "rb") as f:
         id_to_doc = pickle.load(f)
-    return id_to_doc[index]
+    return [id_to_doc[i] for i in indices]
 
 if __name__ == "__main__":
     query = input("Ask an Query to retrieval : ")
