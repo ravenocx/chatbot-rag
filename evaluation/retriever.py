@@ -3,6 +3,7 @@ import numpy as np
 from typing import List, Dict, Set, Tuple, Optional
 from dataclasses import dataclass
 import pandas as pd
+from rag.retriever import retrieve_docs, get_docs
 
 @dataclass
 class QueryEvaluation:
@@ -11,19 +12,17 @@ class QueryEvaluation:
     query_text: str
     retrieved_docs: List[str] #
     relevant_docs: List[str] #
-    precision_at_k: Dict[int, float]
-    recall_at_k: Dict[int, float]
+    precision_at_k: float
+    recall_at_k: float
     mean_reciprocal_rank: float
 
 class RAGRetrievalEvaluator:    
-    def __init__(self, k_values: List[int] = [1, 3, 5, 10]):
+    def __init__(self):
         """
         Initialize evaluator with specified K values
         
-        Args:
-            k_values: List of K values to evaluate (e.g., [1, 3, 5, 10])
         """
-        self.k_values = sorted(k_values)
+        # self.k_values = sorted(k_values)
         self.evaluations = []
     
     def precision_at_k(self, retrieved_docs: List[str], relevant_docs: Set[str], k: int) -> float:
@@ -84,7 +83,7 @@ class RAGRetrievalEvaluator:
         return 0.0
     
     def evaluate_query(self, query_id: str, query_text: str, 
-                      retrieved_docs: List[str], relevant_docs: List[str]) -> QueryEvaluation:
+                      retrieved_docs: List[str], relevant_docs: List[str], k: int) -> QueryEvaluation:
         """
         Evaluate retrieval performance for a single query
         
@@ -93,19 +92,15 @@ class RAGRetrievalEvaluator:
             query_text: The actual query text
             retrieved_docs: List of retrieved document IDs in ranked order
             relevant_docs: List of relevant document IDs for the query
-            
+            k: Number of top documents to consider
         Returns:
             QueryEvaluation object with all metrics
         """
         relevant_set = set(relevant_docs)
         
         # Calculate Precision@K and Recall@K for all K values
-        precision_scores = {}
-        recall_scores = {}
-        
-        for k in self.k_values:
-            precision_scores[k] = self.precision_at_k(retrieved_docs, relevant_set, k)
-            recall_scores[k] = self.recall_at_k(retrieved_docs, relevant_set, k)
+        precision = self.precision_at_k(retrieved_docs, relevant_set, k)
+        recall = self.recall_at_k(retrieved_docs, relevant_set, k)
         
         # Calculate MRR
         rr = self.mean_reciprocal_rank(retrieved_docs, relevant_set)
@@ -115,15 +110,15 @@ class RAGRetrievalEvaluator:
             query_text=query_text,
             retrieved_docs=retrieved_docs,
             relevant_docs=relevant_docs,
-            precision_at_k=precision_scores,
-            recall_at_k=recall_scores,
+            precision_at_k=precision,
+            recall_at_k=recall,
             mean_reciprocal_rank=rr
         )
         
         self.evaluations.append(evaluation)
         return evaluation
     
-    def evaluate_dataset(self, evaluation_data: List[Dict]) -> Dict[str, float]:
+    def evaluate_dataset(self, evaluation_data: List[Dict], k: int) -> Dict[str, float]:
         """
         Evaluate entire dataset and calculate aggregate metrics
         
@@ -133,18 +128,21 @@ class RAGRetrievalEvaluator:
                 - query_text: str  
                 - retrieved_docs: List[str]
                 - relevant_docs: List[str]
+            k: Number of top documents to consider
         
         Returns:
             Dictionary with aggregate metrics
         """
         self.evaluations = []  # Reset previous evaluations
         
-        for data in evaluation_data:
+        enrich_data = enrich_docs(evaluation_data, k)
+        for data in enrich_data:
             self.evaluate_query(
                 query_id=data['query_id'],
                 query_text=data['query_text'],
                 retrieved_docs=data['retrieved_docs'],
-                relevant_docs=data['relevant_docs']
+                relevant_docs=data['relevant_docs'],
+                k=k
             )
         
         return self.get_aggregate_metrics()
@@ -162,12 +160,12 @@ class RAGRetrievalEvaluator:
         metrics = {}
         
         # Aggregate Precision@K and Recall@K
-        for k in self.k_values:
-            precision_scores = [eval.precision_at_k[k] for eval in self.evaluations]
-            recall_scores = [eval.recall_at_k[k] for eval in self.evaluations]
-            
-            metrics[f'Precision@{k}'] = np.mean(precision_scores)
-            metrics[f'Recall@{k}'] = np.mean(recall_scores)
+        precision_scores = [eval.precision_at_k for eval in self.evaluations]
+        recall_scores = [eval.recall_at_k for eval in self.evaluations]
+        
+        metrics[f'Precision@k'] = np.mean(precision_scores)
+        metrics[f'Recall@k'] = np.mean(recall_scores)
+
         
         # Aggregate MRR
         mrr_scores = [eval.mean_reciprocal_rank for eval in self.evaluations]
@@ -192,13 +190,11 @@ class RAGRetrievalEvaluator:
                 'query_text': eval.query_text,
                 'num_retrieved': len(eval.retrieved_docs),
                 'num_relevant': len(eval.relevant_docs),
-                'mean_reciprocal_rank': eval.mean_reciprocal_rank
+                'mean_reciprocal_rank': eval.mean_reciprocal_rank,
+                'precision@k': eval.precision_at_k,
+                'recall@k' : eval.recall_at_k
             }
             
-            # Add Precision@K and Recall@K columns
-            for k in self.k_values:
-                row[f'Precision@{k}'] = eval.precision_at_k[k]
-                row[f'Recall@{k}'] = eval.recall_at_k[k]
             
             rows.append(row)
         
@@ -215,17 +211,10 @@ class RAGRetrievalEvaluator:
         print("=" * 60)
         print("RAG RETRIEVAL EVALUATION SUMMARY")
         print("=" * 60)
-        print(f"Total Queries Evaluated: {len(self.evaluations)}")
-        print()
+        print(f"Total Queries Evaluated: {len(self.evaluations)}\n")
         
-        print("PRECISION@K SCORES:")
-        for k in self.k_values:
-            print(f"  Precision@{k}: {metrics[f'Precision@{k}']:.4f}")
-        
-        print("\nRECALL@K SCORES:")
-        for k in self.k_values:
-            print(f"  Recall@{k}: {metrics[f'Recall@{k}']:.4f}")
-        
+        print(f"PRECISION@K SCORES: {metrics['precision@k']:.4f}\n")
+        print(f"RECALL@K SCORES: {metrics['recall@k']:.4f}\n")
         print(f"\nMEAN RECIPROCAL RANK (MRR): {metrics['MRR']:.4f}")
         print("=" * 60)
     
@@ -241,43 +230,34 @@ class RAGRetrievalEvaluator:
         print(f"Results saved to {filepath}")
 
 
-# Example usage and testing
-def create_sample_data():
-    """Create sample evaluation data for testing"""
-    return [
-        {
-            'query_id': 'q1',
-            'query_text': 'waterproof smartphone under $500',
-            'retrieved_docs': ['doc1', 'doc2', 'doc3', 'doc4', 'doc5'],
-            'relevant_docs': ['doc1', 'doc3', 'doc7']  # doc7 not retrieved
-        },
-        {
-            'query_id': 'q2', 
-            'query_text': 'gaming laptop with RTX 4060',
-            'retrieved_docs': ['doc8', 'doc9', 'doc10', 'doc11'],
-            'relevant_docs': ['doc8', 'doc9']
-        },
-        {
-            'query_id': 'q3',
-            'query_text': 'wireless headphones noise cancelling',
-            'retrieved_docs': ['doc12', 'doc13', 'doc14', 'doc15', 'doc16'],
-            'relevant_docs': ['doc13', 'doc14', 'doc17', 'doc18']  # some not retrieved
-        }
-    ]
+def enrich_docs(unit_tests, top_k):
+    enriched_unit_test = []
 
-def run_example():
+    for ut in unit_tests:
+        retrieved = retrieve_docs(ut['query_text'], top_k=top_k)
+        retrieved_texts = [item['text'] for item in retrieved]
+
+        enriched_unit_test.append({
+            'query_id': ut['query_id'],
+            'query_text': ut['query_text'],
+            'retrieved_docs': retrieved_texts,
+            'relevant_docs_idx': ut['relevant_docs_idx'],
+            "relevant_docs" : get_docs(ut['relevant_docs_idx'])
+        })
+
+    return enriched_unit_test
+
+
+def run_unit_tests(unit_tests, top_k):
     """Run example evaluation"""
     print("Running RAG Retrieval Evaluation Example...")
     print()
     
     # Initialize evaluator
-    evaluator = RAGRetrievalEvaluator(k_values=[1, 3, 5])
-    
-    # Create sample data
-    sample_data = create_sample_data()
+    evaluator = RAGRetrievalEvaluator()
     
     # Evaluate dataset
-    aggregate_metrics = evaluator.evaluate_dataset(sample_data)
+    aggregate_metrics = evaluator.evaluate_dataset(unit_tests, k=top_k)
     
     # Print summary
     evaluator.print_summary()
@@ -286,12 +266,40 @@ def run_example():
     print("\nDETAILED RESULTS:")
     df = evaluator.get_detailed_results()
     print(df.to_string(index=False))
+
+    # Optionally save results
+    evaluator.save_results('./evaluation/retrieval_evaluation.csv')
+    print("[v] Retrieval Evaluation saved to csv file")
     
     return evaluator, aggregate_metrics
 
 if __name__ == "__main__":
-    # Run example
-    evaluator, metrics = run_example()
-    
-    # Optionally save results
-    # evaluator.save_results('rag_evaluation_results.csv')
+    test_cases = [
+        {
+            'query_id': 'Q1',
+            'query_text': 'waterproof smartphone under $500',
+            'relevant_docs_idx': [1, 5, 10]  
+        },
+        {
+            'query_id': 'Q2', 
+            'query_text': 'gaming laptop with RTX 4060',
+            'relevant_docs_idx': [1, 5, 10]  
+        },
+        {
+            'query_id': 'Q3',
+            'query_text': 'wireless headphones noise cancelling',
+            'relevant_docs_idx': [1, 5, 10] 
+        },
+        {
+            'query_id': 'Q4',
+            'query_text': 'wireless headphones noise cancelling',
+            'relevant_docs_idx': [1, 5, 10] 
+        },
+        {
+            'query_id': 'Q5',
+            'query_text': 'wireless headphones noise cancelling',
+            'relevant_docs_idx': [1, 5, 10] 
+        }
+    ]
+    # Run Unit Test
+    evaluator, metrics = run_unit_tests(unit_tests=test_cases, top_k=3)
