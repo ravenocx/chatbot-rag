@@ -215,7 +215,7 @@ class RAGRetrievalEvaluator:
         
         print(f"PRECISION@K SCORES: {metrics['precision@k']:.4f}\n")
         print(f"RECALL@K SCORES: {metrics['recall@k']:.4f}\n")
-        print(f"\nMEAN RECIPROCAL RANK (MRR): {metrics['MRR']:.4f}")
+        print(f"MEAN RECIPROCAL RANK (MRR): {metrics['MRR']:.4f}")
         print("=" * 60)
     
     def save_results(self, filepath: str):
@@ -242,7 +242,7 @@ def enrich_docs(unit_tests, top_k):
             'query_text': ut['query_text'],
             'retrieved_docs': retrieved_texts,
             'relevant_docs_idx': ut['relevant_docs_idx'],
-            "relevant_docs" : get_docs(ut['relevant_docs_idx'])
+            'relevant_docs' : get_docs(ut['relevant_docs_idx'])
         })
 
     return enriched_unit_test
