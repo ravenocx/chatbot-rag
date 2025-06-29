@@ -4,29 +4,21 @@ import pickle
 from dotenv import load_dotenv
 from sentence_transformers import SentenceTransformer
 
-# Cache variables (load once)
-_index = None
-_id_to_doc = None
-_model = None
-
-def load_resources():
-    global _index, _id_to_doc, _model
-    if _index is None or _id_to_doc is None or _model is None:
-        load_dotenv()
-        _index = faiss.read_index(os.getenv("INDEX_FILE"))
-        with open(os.getenv("CHUNK_FILE"), "rb") as f:
-            _id_to_doc = pickle.load(f)
-        _model = SentenceTransformer("BAAI/bge-m3")
-
 def get_detailed_instruct(task_description: str, query: str) -> str:
     return f'Instruct: {task_description}\nQuery: {query}'
 
-def retrieve_docs(qry, k=5) :
-    load_resources()
+def retrieve_docs(qry, k=3) :
+    load_dotenv()
+
+    index = faiss.read_index(os.getenv("INDEX_FILE"))
+    with open(os.getenv("CHUNK_FILE"), "rb") as f:
+        id_to_doc = pickle.load(f)
+
+    model = SentenceTransformer("BAAI/bge-m3")
 
     task = "Given a user’s product-related query, retrieve the most relevant and informative product descriptions, specifications, or recommendations that directly address the query."
 
-    embedding = _model.encode(
+    embedding = model.encode(
         get_detailed_instruct(task, qry),
         convert_to_numpy=True,
         normalize_embeddings=True
@@ -34,14 +26,15 @@ def retrieve_docs(qry, k=5) :
 
 
     # Distance & Indices
-    D, I = _index.search(embedding, k)
+    D, I = index.search(embedding, k)
 
-    return [{"text": _id_to_doc[i], "score": float(D[0][idx])} for idx, i in enumerate(I[0])]
+    return [{"text": id_to_doc[i], "score": float(D[0][idx])} for idx, i in enumerate(I[0])]
 
 def get_docs(index):
-    load_resources()
-    return _id_to_doc[index]
-
+    index = faiss.read_index(os.getenv("INDEX_FILE"))
+    with open(os.getenv("CHUNK_FILE"), "rb") as f:
+        id_to_doc = pickle.load(f)
+    return id_to_doc[index]
 
 if __name__ == "__main__":
     query = input("Ask an Query to retrieval : ")
