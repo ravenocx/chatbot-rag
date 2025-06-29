@@ -240,6 +240,7 @@ class RAGRetrievalEvaluator:
         df.to_csv(filepath, index=False)
         print(f"Results saved to {filepath}")
 
+
 # Example usage and testing
 def create_sample_data():
     """Create sample evaluation data for testing"""
