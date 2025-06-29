@@ -33,6 +33,9 @@ def retrieve(qry, k=3) :
     return [{"text": id_to_doc[i], "score": float(D[0][idx])} for idx, i in enumerate(I[0])]
 
 if __name__ == "__main__":
-    query = input("Query: ")
+    query = input("Ask an Query: ")
     result = retrieve(query)
-    print(result)
+    for i, item in enumerate(result, 1) : 
+        print(f"[{i}] Score : {item['score']}")
+        print(f"Data : {item['text']}")
+        print("-" * 60)

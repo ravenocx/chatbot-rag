@@ -50,6 +50,6 @@ ANSWER:"""
     return result[0]["generated_text"][len(prompt):].strip()
 
 if __name__ == "__main__":
-    query = input("Query: ")
+    query = input("Ask an Query to LLMs: ")
     result = rag_ask(query)
-    print(result)
+    print(f"Answer:\n{result}")
