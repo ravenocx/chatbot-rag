@@ -27,7 +27,7 @@ class QueryResponse(BaseModel):
 @app.get("/", tags=["Status"])
 def status():
     return {
-        "status": "RAG Chatbot API is running",
+        "status": "RAG Chatbot API is running.",
         "version": "v1.0",
         "message": "Ready to process query."
     }

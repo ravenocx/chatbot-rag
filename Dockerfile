@@ -14,17 +14,16 @@ RUN apt-get update && apt-get install -y \
 COPY requirements.txt .
 
 # Install Python dependencies
-RUN pip install --upgrade pip && pip install -r requirements.txt
+RUN pip install --upgrade pip && pip install --no-cache-dir -r requirements.txt
 
 # Copy the entire project
 COPY . .
 
-# Optional: explicitly copy your embedding index and chunks
-# Adjust the paths if your index/chunk files are elsewhere
+# Optional: explicitly copy embedding index or other data
 # COPY rag/data /app/rag/data
 
 # Expose the port FastAPI will run on
 EXPOSE 8000
 
-# Default command to run the app
-CMD ["uvicorn", "api.main:app", "--host", "0.0.0.0", "--port", "8000"]
+# Run using Gunicorn with Uvicorn workers for production
+CMD ["gunicorn", "-k", "uvicorn.workers.UvicornWorker", "api.main:app", "--bind", "0.0.0.0:8000", "--workers", "2", "--timeout", "300"]
