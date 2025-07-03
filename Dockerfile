@@ -36,4 +36,4 @@ ENV CHUNK_FILE=./data/chunk_texts.pkl
 ENV HUGGINGFACE_TOKEN=
 
 # Run using Gunicorn with Uvicorn workers for production
-CMD ["gunicorn", "-k", "uvicorn.workers.UvicornWorker", "api.main:app", "--bind", "0.0.0.0:8000", "--workers", "2", "--timeout", "300"]
+CMD ["gunicorn", "-k", "uvicorn.workers.UvicornWorker", "api.main:app", "--bind", "0.0.0.0:8000", "--workers", "1", "--timeout", "300"]
