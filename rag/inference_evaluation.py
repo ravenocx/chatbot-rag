@@ -125,6 +125,8 @@ if __name__ == "__main__":
         }
     ]
 
+    print("Running RAG Generation Evaluation...")
+    print()
     evaluator = RAGGenerationEvaluator(unit_tests=test_cases, model=model, tokenizer=tokenizer)
 
     metrics, tc = evaluator.evaluate_generation(top_k=3, lang="id")

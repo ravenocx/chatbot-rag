@@ -36,10 +36,13 @@ def get_docs(indices):
         id_to_doc = pickle.load(f)
     return [id_to_doc[i] for i in indices]
 
+def truncate_string(s, max_length=100):
+    return s[:max_length] + '...' if len(s) > max_length else s
+
 if __name__ == "__main__":
     query = input("Ask an Query to retrieval : ")
-    result = retrieve_docs(query)
+    result = retrieve_docs(query, k=5)
     for i, item in enumerate(result, 1) : 
         print(f"[{i}] Score : {item['score']}")
-        print(f"Data : {item['text']}")
+        print(f"Data : {truncate_string(item['text'], max_length=1000)}")
         print("-" * 60)
