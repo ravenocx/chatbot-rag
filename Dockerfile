@@ -27,7 +27,7 @@ EXPOSE 8000
 
 # Set Huggingface cache for prod
 ENV HF_HOME=/workspace/hf-home
-ENV TRANSFORMERS_CACHE=/workspace/hf-cache
+# ENV TRANSFORMERS_CACHE=/workspace/hf-cache
 ENV SENTENCE_TRANSFORMERS_HOME=/workspace/st-cache
 
 # Set Another env
