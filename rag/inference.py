@@ -40,7 +40,7 @@ def generate_response(query: str, k=5, max_tokens=4096):
 CRITICAL INSTRUCTIONS:
 1.  **LANGUAGE:** ALWAYS respond in Bahasa Indonesia. The product data provided is also in Bahasa Indonesia - use this data directly without translation.
 2.  **DATA ACCURACY:** Base your answer ENTIRELY and SOLELY on the information within the provided data below. Do NOT use any external knowledge or make assumptions about products.
-3.  **RELEVANCE FILTER:** ONLY extract and use the specific parts of the product data that are directly relevant to the user's question. If there is clearly no relevant information AT ALL within the data, respond with: "Maaf, informasi yang Anda cari tidak tersedia dalam data kami saat ini." Otherwise, answer based ONLY on the RELEVANT parts.
+3.  **RELEVANCE FILTER:** ONLY extract and use the specific parts of the product data that are directly relevant to the user's question, even if the full data contains unrelated information. Ignore any parts of the context that are NOT related to the question.
 
 PROVIDED PRODUCT DATA:
 {context}
