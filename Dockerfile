@@ -25,5 +25,10 @@ COPY . .
 # Expose the port FastAPI will run on
 EXPOSE 8000
 
+# Set Huggingface cache for prod
+ENV HF_HOME=/workspace/hf-home
+ENV TRANSFORMERS_CACHE=/workspace/hf-cache
+ENV SENTENCE_TRANSFORMERS_HOME=/workspace/st-cache
+
 # Run using Gunicorn with Uvicorn workers for production
 CMD ["gunicorn", "-k", "uvicorn.workers.UvicornWorker", "api.main:app", "--bind", "0.0.0.0:8000", "--workers", "2", "--timeout", "300"]
