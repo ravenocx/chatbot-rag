@@ -31,8 +31,8 @@ ENV HF_HOME=/workspace/hf-home
 ENV SENTENCE_TRANSFORMERS_HOME=/workspace/st-cache
 
 # Set Another env
-ENV INDEX_FILE=./data/tokopoin_product.index
-ENV CHUNK_FILE=./data/chunk_texts.pkl
+ENV INDEX_FILE=./rag/data/tokopoin_product.index
+ENV CHUNK_FILE=./rag/data/chunk_texts.pkl
 ENV HUGGINGFACE_TOKEN=
 
 # Run using Gunicorn with Uvicorn workers for production
