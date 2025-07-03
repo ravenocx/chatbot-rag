@@ -52,7 +52,7 @@ class RAGGenerationEvaluator:
 
         return enriched_unit_test
     
-    def evaluate_generation(self, top_k=3, lang="id"):
+    def evaluate_generation(self, top_k=5, lang="id"):
         enriched_test_cases = self.enrich_predictions(top_k=top_k)
 
         predictions =[tc['prediction'] for tc in enriched_test_cases]
@@ -129,7 +129,7 @@ if __name__ == "__main__":
     print()
     evaluator = RAGGenerationEvaluator(unit_tests=test_cases, model=model, tokenizer=tokenizer)
 
-    metrics, tc = evaluator.evaluate_generation(top_k=3, lang="id")
+    metrics, tc = evaluator.evaluate_generation(top_k=5, lang="id")
 
     print_summary(metrics=metrics, tc=tc)
 
