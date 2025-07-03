@@ -30,5 +30,10 @@ ENV HF_HOME=/workspace/hf-home
 ENV TRANSFORMERS_CACHE=/workspace/hf-cache
 ENV SENTENCE_TRANSFORMERS_HOME=/workspace/st-cache
 
+# Set Another env
+ENV INDEX_FILE=./data/tokopoin_product.index
+ENV CHUNK_FILE=./data/chunk_texts.pkl
+ENV HUGGINGFACE_TOKEN=
+
 # Run using Gunicorn with Uvicorn workers for production
 CMD ["gunicorn", "-k", "uvicorn.workers.UvicornWorker", "api.main:app", "--bind", "0.0.0.0:8000", "--workers", "2", "--timeout", "300"]
