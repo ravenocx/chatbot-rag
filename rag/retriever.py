@@ -16,7 +16,7 @@ def retrieve_docs(qry, k=5) :
 
     model = SentenceTransformer("BAAI/bge-m3")
 
-    task = "Given a user’s product-related query, retrieve the most relevant and informative product descriptions, specifications, or recommendations that directly address the query."
+    task = "Given a user’s product-related query, retrieve the most RELEVANT and informative product descriptions, specifications, or recommendations that directly address the query."
 
     embedding = model.encode(
         get_detailed_instruct(task, qry),

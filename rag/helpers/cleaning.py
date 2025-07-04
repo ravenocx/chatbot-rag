@@ -74,12 +74,13 @@ def normalize_punctuation(text: str) -> str:
         - Single space after punctuation if followed by a word
         - Repeated punctuation collapsed into a single mark
     """
+    text = re.sub(r"([.,!?])\1+", r"\1", text)
+
     text = re.sub(r"\s+([.,!?;:])", r"\1", text)
 
     # Only add space after punctuation if NOT followed by another digit (to avoid breaking numbers)
-    text = re.sub(r"([.,!?;:])(?=[^\d\s])", r"\1 ", text)
+    text = re.sub(r"([.,!?;:])(?=[^\d\s\W])", r"\1 ", text)
 
-    text = re.sub(r"([.,!?])\1+", r"\1", text)
 
     return text.strip()
 
@@ -93,7 +94,9 @@ def decode_html_entities(text: str) -> str:
     Returns:
         A string with all HTML entities converted to their literal characters.
     """
-    return html.unescape(text)
+    text = html.unescape(text)
+    text = re.sub(r"&+", "", text)
+    return text
 
 
 def remove_non_informative(text: str) -> str:
@@ -108,11 +111,11 @@ def remove_non_informative(text: str) -> str:
     """
     NON_INFORMATIVE_PATTERNS = [
         r"click here",                
-        r"cek katalog.*",           
-        r"klik.*di sini",
-        r"silakan tanyakan.*",
-        r"jangan lewatkan.*",    
-        r"segera miliki.*",           
+        r"cek katalog.*?([.!?\n]|$)",           
+        r"klik.*?di sini",
+        r"silakan tanyakan.*?([.!?\n]|$)",
+        r"jangan lewatkan.*?([.!?\n]|$)",    
+        r"segera miliki.*?([.!?\n]|$)",           
     ]
     
     for pattern in NON_INFORMATIVE_PATTERNS:

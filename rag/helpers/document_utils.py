@@ -98,8 +98,7 @@ def clean_page_content(page_content: str) -> str :
     cleaned_whitespace = c.normalize_whitespace(page_content)
     cleaned_punctuation = c.normalize_punctuation(cleaned_whitespace)
     cleaned_html_entities = c.decode_html_entities(cleaned_punctuation)
-    cleaned_non_informative_patterns = c.remove_non_informative(cleaned_html_entities)
-    cleaned_emoji = c.remove_emoji(cleaned_non_informative_patterns)
+    cleaned_emoji = c.remove_emoji(cleaned_html_entities)
     cleaned_special_symbols = c.remove_special_symbols(cleaned_emoji)
     cleaned_text = c.remove_accents(cleaned_special_symbols)
     
