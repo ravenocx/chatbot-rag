@@ -3,7 +3,11 @@ import numpy as np
 from typing import List, Dict, Set, Tuple, Optional
 from dataclasses import dataclass
 import pandas as pd
-from retriever import retrieve_docs, get_docs
+from rag.retriever import retrieve_docs, get_docs
+from api.db.database import db_connection, get_rag_configuration
+from dotenv import load_dotenv
+
+load_dotenv()
 
 @dataclass
 class QueryEvaluation:
@@ -118,7 +122,7 @@ class RAGRetrievalEvaluator:
         self.evaluations.append(evaluation)
         return evaluation
     
-    def evaluate_dataset(self, evaluation_data: List[Dict], k: int) -> Dict[str, float]:
+    def evaluate_dataset(self, db_conn, evaluation_data: List[Dict]) -> Dict[str, float]:
         """
         Evaluate entire dataset and calculate aggregate metrics
         
@@ -133,16 +137,17 @@ class RAGRetrievalEvaluator:
         Returns:
             Dictionary with aggregate metrics
         """
+        rag_config = get_rag_configuration(db_conn)
         self.evaluations = []  # Reset previous evaluations
         
-        enrich_data = enrich_docs(evaluation_data, k)
+        enrich_data = enrich_docs(db_conn, evaluation_data)
         for data in enrich_data:
             self.evaluate_query(
                 query_id=data['query_id'],
                 query_text=data['query_text'],
                 retrieved_docs=data['retrieved_docs'],
                 relevant_docs=data['relevant_docs'],
-                k=k
+                k=rag_config['top_k_retrieval']
             )
         
         return self.get_aggregate_metrics()
@@ -230,11 +235,11 @@ class RAGRetrievalEvaluator:
         print(f"Results saved to {filepath}")
 
 
-def enrich_docs(unit_tests, top_k):
+def enrich_docs(db_conn, unit_tests):
     enriched_unit_test = []
 
     for ut in unit_tests:
-        retrieved = retrieve_docs(ut['query_text'], k=top_k)
+        retrieved = retrieve_docs(db_conn, ut['query_text'])
         retrieved_texts = [item['text'] for item in retrieved]
 
         enriched_unit_test.append({
@@ -248,16 +253,18 @@ def enrich_docs(unit_tests, top_k):
     return enriched_unit_test
 
 
-def run_unit_tests(unit_tests, top_k):
+def run_unit_tests(unit_tests):
     """Run example evaluation"""
     print("Running RAG Retrieval Evaluation...")
     print()
+
+    db_conn = db_connection()
     
     # Initialize evaluator
     evaluator = RAGRetrievalEvaluator()
     
     # Evaluate dataset
-    aggregate_metrics = evaluator.evaluate_dataset(unit_tests, k=top_k)
+    aggregate_metrics = evaluator.evaluate_dataset(db_conn, unit_tests)
     
     # Print summary
     evaluator.print_summary()
@@ -268,7 +275,7 @@ def run_unit_tests(unit_tests, top_k):
     print(df.to_string(index=False))
 
     # Optionally save results
-    evaluator.save_results('./evaluation/retrieval_evaluation.csv')
+    evaluator.save_results('./rag/evaluation/retrieval_evaluation.csv')
     print("[v] Retrieval Evaluation saved to csv file")
     
     return evaluator, aggregate_metrics
@@ -302,4 +309,4 @@ if __name__ == "__main__":
         }
     ]
     # Run Unit Test
-    evaluator, metrics = run_unit_tests(unit_tests=test_cases, top_k=5)
+    evaluator, metrics = run_unit_tests(unit_tests=test_cases)

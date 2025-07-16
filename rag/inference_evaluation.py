@@ -1,9 +1,13 @@
 from typing import List, Dict
 import evaluate
-from inference import generate_response, model, tokenizer
+from rag.inference import generate_response, model, tokenizer
+from rag.db.database import db_connection
+from dotenv import load_dotenv
 import pandas as pd
 import torch
 import math
+
+load_dotenv()
 
 class RAGGenerationEvaluator:    
     def __init__(self, unit_tests: List[Dict], model, tokenizer):
@@ -37,11 +41,11 @@ class RAGGenerationEvaluator:
         result = self.bertscore.compute(predictions=predictions, references=references, lang=lang)
         return round(sum(result["f1"]) / len(result["f1"]), 4)
 
-    def enrich_predictions(self, top_k):
+    def enrich_predictions(self, db_conn):
         enriched_unit_test = []
 
         for ut in self.unit_tests:
-            prediction = generate_response(ut['query_text'], k=top_k)
+            prediction = generate_response(db_conn, ut['query_text'])
 
             enriched_unit_test.append({
                 'query_id': ut['query_id'],
@@ -52,8 +56,8 @@ class RAGGenerationEvaluator:
 
         return enriched_unit_test
     
-    def evaluate_generation(self, top_k=5, lang="id"):
-        enriched_test_cases = self.enrich_predictions(top_k=top_k)
+    def evaluate_generation(self, db_conn, lang="id"):
+        enriched_test_cases = self.enrich_predictions(db_conn)
 
         predictions =[tc['prediction'] for tc in enriched_test_cases]
         references = [tc['reference'] for tc in enriched_test_cases]
@@ -129,8 +133,9 @@ if __name__ == "__main__":
     print()
     evaluator = RAGGenerationEvaluator(unit_tests=test_cases, model=model, tokenizer=tokenizer)
 
-    metrics, tc = evaluator.evaluate_generation(top_k=5, lang="id")
+    db_conn = db_connection()
+    metrics, tc = evaluator.evaluate_generation(db_conn, lang="id")
 
     print_summary(metrics=metrics, tc=tc)
 
-    save_result(metrics=metrics, filepath='./evaluation/generation_evaluation.csv')
+    save_result(metrics=metrics, filepath='./rag/evaluation/generation_evaluation.csv')
