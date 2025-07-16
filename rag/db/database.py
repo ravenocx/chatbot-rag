@@ -30,6 +30,7 @@ def get_all_products(db):
     """)
     
     rows = cursor.fetchall()
+    cursor.close()
     return rows
 
 def get_all_attributes(db):
@@ -42,5 +43,6 @@ def get_all_attributes(db):
     """)
     
     rows = cursor.fetchall()
+    cursor.close()
     attributes = {row["id"]: row["name"] for row in rows}
     return attributes
