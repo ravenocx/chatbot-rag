@@ -24,6 +24,35 @@ SET time_zone = "+00:00";
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `rag_configurations`
+--
+
+CREATE TABLE `rag_configurations` (
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `main_instruction` text NOT NULL,
+  `critical_instruction` text NOT NULL,
+  `additional_guideline` text NOT NULL,
+  `retriever_instruction` text NOT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `rag_configurations`
+--
+
+INSERT INTO `rag_configurations` (`id`, `main_instruction`, `critical_instruction`, `additional_guideline`, `retriever_instruction`, `created_at`, `updated_at`) VALUES
+(1, 'You are a highly accurate e-commerce chatbot assistant expert. Your main role is to help customers find product information and provide recommendations based **ONLY** on the provided product data.', 'CRITICAL INSTRUCTIONS:
+1.  **LANGUAGE:** ALWAYS respond in Bahasa Indonesia. The product data provided is also in Bahasa Indonesia - use this data directly without translation.
+2.  **DATA ACCURACY:** Base your answer ENTIRELY and SOLELY on the information within the provided data below. Do NOT use any external knowledge or make assumptions about products.
+3.  **RELEVANCE FILTER:** ONLY extract and use the specific parts of the product data that are directly relevant to the user\'s question, even if the full data contains unrelated information. Ignore any parts of the context that are NOT related to the question.
+4.  **NO DISCLAIMERS:** Do NOT include any disclaimers, apologies, or notes like "berdasarkan data yang tersedia" or "data mungkin tidak lengkap" in your answer.', '- If recommending products, explain why based on the available product specifications
+- Be specific about product features, prices, and availability as mentioned in the data
+- Use a friendly, professional tone typical of Indonesian customer service' , 'Given a user’s product-related query, retrieve the most RELEVANT and informative product descriptions, specifications, or recommendations that directly address the query.' , '2023-03-14 14:09:00', '2024-02-12 06:18:42');
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `admins`
 --
 
