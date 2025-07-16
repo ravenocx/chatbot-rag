@@ -6576,8 +6576,8 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`id`, `country_id`, `uid`, `fcm_token`, `name`, `username`, `last_name`, `email`, `image`, `phone`, `balance`, `email_verified_at`, `last_seen`, `address`, `billing_address`, `google_id`, `point`, `otp_code`, `password`, `status`, `remember_token`, `created_at`, `updated_at`) VALUES
-(1, NULL, '0V0A-ohKiUJlO-vVrS', NULL, 'Yoga', NULL, NULL, 'customer@mail.com', NULL, '081775106640', '0.00000000', NULL, '2025-06-26 14:19:44', NULL, NULL, NULL, 0, NULL, '$2y$10$fe6NcTFXtpl9Wrr2pwh7d.Ks5thlwcmncZGddkNwqcBpuaT33ymAa', '1', '50XJYE5wRIIJD6CVAC9acd12shi9zfzqHsdk2TyFOILrxwkytgqEgFDVoi9J', '2025-05-06 18:14:52', '2025-06-26 14:19:45'),
-(2, NULL, '7hqP-EI3MEwBw-BV4K', NULL, NULL, NULL, NULL, 'customer2@mail.com', NULL, '081775106644', '0.00000000', NULL, '2025-06-22 16:03:45', NULL, NULL, NULL, 0, NULL, '$2y$10$JbRTF/mQNtbuZXFTrIoKFe86XlpvWrffOPwwtNpPBFurA8iPXFcmK', '1', 'drrPtxhqrG9Y1gGzGkAlyxgapCUqzqeZ0FSevN725Ds5ZYMc3s0hD13gOuE4', '2025-05-10 16:47:03', '2025-06-22 16:03:46');
+(1, NULL, '0V0A-ohKiUJlO-vVrS', NULL, 'Yoga', NULL, NULL, 'customer@gmail.com', NULL, '081775106640', '0.00000000', NULL, '2025-06-26 14:19:44', NULL, NULL, NULL, 0, NULL, '$2y$10$fe6NcTFXtpl9Wrr2pwh7d.Ks5thlwcmncZGddkNwqcBpuaT33ymAa', '1', '50XJYE5wRIIJD6CVAC9acd12shi9zfzqHsdk2TyFOILrxwkytgqEgFDVoi9J', '2025-05-06 18:14:52', '2025-06-26 14:19:45'),
+(2, NULL, '7hqP-EI3MEwBw-BV4K', NULL, 'Haris', NULL, NULL, 'haris@gmail.com', NULL, '081775106644', '0.00000000', NULL, '2025-06-22 16:03:45', NULL, NULL, NULL, 0, NULL, '$2y$10$NMGKTZrnVr0dsPMiL7RSduInOF84xmVQ.JPdjHMcandKa/sfMf/n6', '1', 'drrPtxhqrG9Y1gGzGkAlyxgapCUqzqeZ0FSevN725Ds5ZYMc3s0hD13gOuE4', '2025-05-10 16:47:03', '2025-06-22 16:03:46');
 
 -- --------------------------------------------------------
 

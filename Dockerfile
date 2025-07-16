@@ -36,4 +36,5 @@ ENV CHUNK_FILE=./rag/data/chunk_texts.pkl
 ENV HUGGINGFACE_TOKEN=
 
 # Run using Gunicorn with Uvicorn workers for production
+# comment if want to build the app
 CMD ["gunicorn", "-k", "uvicorn.workers.UvicornWorker", "api.main:app", "--bind", "0.0.0.0:8000", "--workers", "1", "--timeout", "300"]
