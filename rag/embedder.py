@@ -3,6 +3,7 @@ import rag.helpers.document_utils as utils
 from transformers import AutoTokenizer
 from sentence_transformers import SentenceTransformer
 import faiss
+import os
 
 def embedd_product_data(db_conn): 
     products = db.get_all_products(db_conn)
@@ -42,7 +43,7 @@ def embedd_product_data(db_conn):
     print(f"✅ Added {embeddings.shape[0]} vectors to FAISS index")
 
     # Export FAISS Index
-    faiss.write_index(index, "data/tokopoin_product.index")
+    faiss.write_index(index, os.getenv("INDEX_FILE"))
     print("💾 Successfully export index data")
     
 

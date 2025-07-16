@@ -7,6 +7,9 @@ from api.utils import create_access_token
 import api.middleware as mw
 import api.db.database as db
 from passlib.context import CryptContext
+from dotenv import load_dotenv
+
+load_dotenv()
 
 app = FastAPI(
     title="Tokopoin RAG Chatbot API",

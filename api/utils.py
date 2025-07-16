@@ -2,9 +2,6 @@ import jwt
 from jwt import PyJWTError
 from datetime import datetime, timedelta
 import os
-from dotenv import load_dotenv
-
-load_dotenv()
 
 SECRET_KEY = os.getenv("JWT_SECRET_KEY")
 
