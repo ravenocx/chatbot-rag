@@ -2,7 +2,7 @@ from fastapi import FastAPI, HTTPException, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import List
-# from rag.inference import generate_response
+from rag.inference import generate_response
 from rag.embedder import embedd_product_data
 from rag.retriever import retrieve_docs
 from api.utils import create_access_token
@@ -146,14 +146,14 @@ def login_admin(payload: LoginRequest):
         print("[DEBUG] User Login error :", str(e))
         raise HTTPException(status_code=500, detail=str(e))
 
-# @app.post("/api/query", response_model=QueryResponse, tags=["Chatbot"])
-# def answer_query(payload: QueryRequest, user_payload: dict = Depends(mw.user_middleware)):
-#     try:
-#         answer = generate_response(payload.query, k=5, max_tokens=4096) # Change k for top (n) retrieval
-#         return QueryResponse(success=True, status_code=200, message="Successfully Generate answer", answer=answer)
-#     except Exception as e:
-#         print("[DEBUG] Query error :", str(e))
-#         raise HTTPException(status_code=500, detail=str(e))
+@app.post("/api/query", response_model=QueryResponse, tags=["Chatbot RAG"])
+def answer_query(payload: QueryRequest, user_payload: dict = Depends(mw.user_middleware)):
+    try:
+        answer = generate_response(db_conn, payload.query, max_tokens=4096) # Change max tokens if needed
+        return QueryResponse(success=True, status_code=200, message="Successfully Generate answer", answer=answer)
+    except Exception as e:
+        print("[DEBUG] Chatbot Query error :", str(e))
+        raise HTTPException(status_code=500, detail=str(e))
     
 @app.post("/api/embedd-products", response_model=EmbeddingResponse, tags=["Embedd Product Data"])
 def embedd_products(admin: dict = Depends(mw.admin_middleware)):
