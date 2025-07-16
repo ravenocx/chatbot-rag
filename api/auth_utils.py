@@ -11,7 +11,7 @@ SECRET_KEY = os.getenv("JWT_SECRET_KEY")
 def create_access_token(user_id: int, role: str, expires_delta: timedelta = None ):
     expire = datetime.utcnow() + (expires_delta or timedelta(hours=6))
     claims = {
-        "sub": user_id,
+        "sub": str(user_id),
         "role": role,
         "iat" : datetime.utcnow(),
         "exp": expire,
@@ -22,6 +22,8 @@ def create_access_token(user_id: int, role: str, expires_delta: timedelta = None
 def verify_access_token(token: str):
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=["HS256"])
+        print("[DEBUG] Decoded payload:", payload)
         return payload
-    except PyJWTError:
+    except PyJWTError as e:
+        print("[DEBUG] JWT decode error:", str(e))
         return None
