@@ -14,6 +14,7 @@ app = FastAPI(
 )
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+db_conn = db.db_connection()
 
 app.add_middleware(
     CORSMiddleware,
@@ -67,15 +68,13 @@ def status():
 @app.post("/api/register/user",response_model=RegisterResponse, tags=["Register User"])
 def register_user(payload: RegisterRequest):
     try:
-        conn = db.db_connection()
-
         # Check if email already exists
-        existing_user = db.get_user(conn, payload.email)
+        existing_user = db.get_user(db_conn, payload.email)
         if existing_user:
             raise HTTPException(status_code=400, detail="Email already registered")
 
         hashed_password = pwd_context.hash(payload.password)
-        user_id = db.create_user(conn, payload.name, payload.email, payload.phone_number, hashed_password)
+        user_id = db.create_user(db_conn, payload.name, payload.email, payload.phone_number, hashed_password)
 
         if not user_id:
             raise HTTPException(status_code=500, detail="Failed to register user")
@@ -91,8 +90,7 @@ def register_user(payload: RegisterRequest):
 @app.post("/api/login/user", response_model=LoginResponse, tags=["User Login"])
 def login_user(payload: LoginRequest):
     try : 
-        conn = db.db_connection()
-        user = db.get_user(conn, payload.email)
+        user = db.get_user(db_conn, payload.email)
 
         if not user:
             raise HTTPException(status_code=401, detail="Invalid email or password")
@@ -111,8 +109,7 @@ def login_user(payload: LoginRequest):
 @app.post("/api/login/admin", response_model=LoginResponse, tags=["Admin Login"])
 def login_admin(payload: LoginRequest):
     try :
-        conn = db.db_connection()
-        admin = db.get_admin(conn, payload.email)
+        admin = db.get_admin(db_conn, payload.email)
 
         if not admin:
             raise HTTPException(status_code=401, detail="Invalid email or password")
