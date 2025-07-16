@@ -19,3 +19,4 @@ rouge_score
 absl-py
 bert_score
 gunicorn
+pyjwt
