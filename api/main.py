@@ -1,8 +1,10 @@
 from fastapi import FastAPI, HTTPException, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
+from typing import List
 # from rag.inference import generate_response
 from rag.embedder import embedd_product_data
+from rag.retriever import retrieve_docs
 from api.utils import create_access_token
 import api.middleware as mw
 import api.db.database as db
@@ -63,6 +65,16 @@ class EmbeddingResponse(BaseModel):
     success: bool
     status_code: int
     message : str
+
+class RetrievalResult(BaseModel):
+    score: float
+    document: str
+
+class RetrievalResponse(BaseModel):
+    success: bool
+    status_code: int
+    message : str
+    result: List[RetrievalResult]
 
 @app.get("/api/status", tags=["Status"])
 def status():
@@ -150,6 +162,19 @@ def embedd_products(admin: dict = Depends(mw.admin_middleware)):
         return EmbeddingResponse(success=True, status_code=200, message="Successfully Embedd Product Data")
     except Exception as e:
         print("[DEBUG] Embedding error :", str(e))
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/api/retrieve-documents", response_model=RetrievalResponse, tags=["Retrieve Product Document Data"])
+def embedd_products(payload: QueryRequest, admin: dict = Depends(mw.admin_middleware)):
+    try:
+        results = retrieve_docs(db_conn, payload.query)
+        print(results[0]["text"])
+        return RetrievalResponse(success=True, 
+                                 status_code=200, 
+                                 message="Successfully Retrieve Product Document Data", 
+                                 result=[RetrievalResult(document=item["text"], score=item["score"]) for item in results])
+    except Exception as e:
+        print("[DEBUG] Retrieval error :", str(e))
         raise HTTPException(status_code=500, detail=str(e))
 
 # ! uvicorn app.main:app --reload or run main.py
