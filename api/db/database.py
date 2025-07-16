@@ -36,7 +36,6 @@ def create_user(db, name: str, email: str, phone_number:str, hashed_password:str
         new_user_id = cursor.lastrowid
         return new_user_id
     except Exception as e:
-        print("[DEBUG] Create User Query error", str(e))
         db.rollback()
         return None
     finally:
@@ -49,3 +48,37 @@ def get_rag_configuration(db):
     rag_config = cursor.fetchone()
     cursor.close()
     return rag_config
+
+def update_rag_configuration(db, data: dict):
+    cursor= db.cursor()
+    try :
+        sql = """
+        UPDATE rag_configurations 
+        SET 
+            main_instruction=%s,
+            critical_instruction=%s,
+            additional_guideline=%s,
+            retriever_instruction=%s,
+            top_k_retrieval=%s,
+            updated_at=NOW()
+        WHERE id = %s
+        """
+
+        cursor.execute(sql, (
+            data["main_instruction"],
+            data["critical_instruction"],
+            data["additional_guideline"],
+            data["retriever_instruction"],
+            data["top_k_retrieval"],
+            1
+        ))
+
+        db.commit()
+    except Exception as e:
+        db.rollback()
+        print("debug :", str(e))
+        return None
+    finally :
+        cursor.close()
+        
+    return get_rag_configuration(db)

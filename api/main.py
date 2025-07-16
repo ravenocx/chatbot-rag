@@ -1,8 +1,9 @@
 from fastapi import FastAPI, HTTPException, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
-from typing import List
-from rag.inference import generate_response
+from typing import List, Optional
+from datetime import datetime
+# from rag.inference import generate_response
 from rag.embedder import embedd_product_data
 from rag.retriever import retrieve_docs
 from api.utils import create_access_token
@@ -76,6 +77,28 @@ class RetrievalResponse(BaseModel):
     message : str
     result: List[RetrievalResult]
 
+class RagConfiguration(BaseModel):
+    main_instruction: str
+    critical_instruction: str
+    additional_guideline: str
+    retriever_instruction: str
+    top_k_retrieval: int
+    created_at: Optional[datetime]
+    updated_at: Optional[datetime]
+
+class RagConfigResponse(BaseModel):
+    success: bool
+    status_code: int
+    message: str
+    data: RagConfiguration
+
+class UpdateRagConfigRequest(BaseModel):
+    main_instruction: str
+    critical_instruction: str
+    additional_guideline: str
+    retriever_instruction: str
+    top_k_retrieval: int
+
 @app.get("/api/status", tags=["Status"])
 def status():
     return {
@@ -146,14 +169,14 @@ def login_admin(payload: LoginRequest):
         print("[DEBUG] User Login error :", str(e))
         raise HTTPException(status_code=500, detail=str(e))
 
-@app.post("/api/query", response_model=QueryResponse, tags=["Chatbot RAG"])
-def answer_query(payload: QueryRequest, user_payload: dict = Depends(mw.user_middleware)):
-    try:
-        answer = generate_response(db_conn, payload.query, max_tokens=4096) # Change max tokens if needed
-        return QueryResponse(success=True, status_code=200, message="Successfully Generate answer", answer=answer)
-    except Exception as e:
-        print("[DEBUG] Chatbot Query error :", str(e))
-        raise HTTPException(status_code=500, detail=str(e))
+# @app.post("/api/query", response_model=QueryResponse, tags=["Chatbot RAG"])
+# def answer_query(payload: QueryRequest, user_payload: dict = Depends(mw.user_middleware)):
+#     try:
+#         answer = generate_response(db_conn, payload.query, max_tokens=4096) # Change max tokens if needed
+#         return QueryResponse(success=True, status_code=200, message="Successfully Generate answer", answer=answer)
+#     except Exception as e:
+#         print("[DEBUG] Chatbot Query error :", str(e))
+#         raise HTTPException(status_code=500, detail=str(e))
     
 @app.post("/api/embedd-products", response_model=EmbeddingResponse, tags=["Embedd Product Data"])
 def embedd_products(admin: dict = Depends(mw.admin_middleware)):
@@ -176,6 +199,50 @@ def embedd_products(payload: QueryRequest, admin: dict = Depends(mw.admin_middle
     except Exception as e:
         print("[DEBUG] Retrieval error :", str(e))
         raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/api/rag-configurations", response_model=RagConfigResponse, tags=["Show RAG Configurations"])
+def get_rag_configurations(admin: dict = Depends(mw.admin_middleware)):
+    try:
+        rag_config = db.get_rag_configuration(db_conn)
+        return RagConfigResponse(
+            success=True,
+            status_code=200,
+            message="Successfully retrieved RAG configurations",
+            data=RagConfiguration(
+                main_instruction = rag_config["main_instruction"],
+                critical_instruction = rag_config["critical_instruction"],
+                additional_guideline = rag_config["additional_guideline"],
+                retriever_instruction = rag_config["retriever_instruction"],
+                top_k_retrieval = rag_config["top_k_retrieval"],
+                created_at = rag_config["created_at"],
+                updated_at = rag_config["updated_at"]
+            )
+        )
+    except Exception as e:
+        print("[DEBUG] Retrieval RAG Configurations error:", str(e))
+        raise HTTPException(status_code=500, detail="Internal server error")
+
+@app.put("/api/rag-configurations", response_model=RagConfigResponse, tags=["Update RAG Configurations"])
+def update_rag_configuration(payload: UpdateRagConfigRequest, admin: dict = Depends(mw.admin_middleware)):
+    try:
+        result = db.update_rag_configuration(db_conn, payload.model_dump())
+        return RagConfigResponse(
+            success=True,
+            status_code=200,
+            message="Successfully updated RAG configurations",
+            data=RagConfiguration(
+                main_instruction = result["main_instruction"],
+                critical_instruction = result["critical_instruction"],
+                additional_guideline = result["additional_guideline"],
+                retriever_instruction = result["retriever_instruction"],
+                top_k_retrieval = result["top_k_retrieval"],
+                created_at = result["created_at"],
+                updated_at = result["updated_at"]
+            )
+        )
+    except Exception as e:
+        print("[DEBUG] Update RAG Configurations error:", str(e))
+        raise HTTPException(status_code=500, detail="Internal server error")
 
 # ! uvicorn app.main:app --reload or run main.py
 if __name__ == "__main__":
