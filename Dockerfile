@@ -34,6 +34,14 @@ ENV SENTENCE_TRANSFORMERS_HOME=/workspace/st-cache
 ENV INDEX_FILE=./rag/data/tokopoin_product.index
 ENV CHUNK_FILE=./rag/data/chunk_texts.pkl
 ENV HUGGINGFACE_TOKEN=
+ENV JWT_SECRET_KEY=
+
+# ENV DB_HOST=
+# ENV DB_PORT=
+# ENV DB_NAME=
+# ENV DB_USERNAME=
+# ENV DB_PASSWORD=
+
 
 # Run using Gunicorn with Uvicorn workers for production
 # comment if want to build the app

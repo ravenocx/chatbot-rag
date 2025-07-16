@@ -1,0 +1,41 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:latest
+    container_name: db-mysql
+    restart: always
+    environment:
+      MYSQL_DATABASE: tokopoin
+      MYSQL_ROOT_PASSWORD: root # username is root
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+      - ./rag/data:/docker-entrypoint-initdb.d
+
+  adminer:
+    image: adminer
+    container_name: db-adminer
+    restart: always
+    ports:
+      - "8080:8080"
+  
+  app:
+    image: ritsuha/chatbot-rag:latest
+    # build: . -> use this if want to build from Dockerfile
+    container_name: chatbot-rag
+    restart: always
+    environment:
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_NAME: tokopoin
+      DB_USERNAME: root
+      DB_PASSWORD: root
+    depends_on:
+      - mysql
+    ports:
+      - "8000:8000"
+
+volumes:
+  mysql-data:
