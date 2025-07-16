@@ -50,7 +50,7 @@ CREATE TABLE `admins` (
 --
 
 INSERT INTO `admins` (`id`, `uid`, `role_id`, `created_by`, `updated_by`, `name`, `user_name`, `email`, `phone`, `image`, `address`, `password`, `status`, `created_at`, `updated_at`) VALUES
-(1, NULL, 1, NULL, NULL, 'Admin', 'admin', 'admin@admin.com', '123123', '65ae633fc7a411705927487.png', NULL, '$2y$10$/rlWCJpoEyTmGjAFwd0bZu8fCRDecKdrEvPo3wXwrRirTcT0SgOw2', '1', '2023-03-14 14:09:00', '2024-02-12 06:18:42');
+(1, NULL, 1, NULL, NULL, 'Admin', 'admin', 'admin@gmail.com', '123123', '65ae633fc7a411705927487.png', NULL, '$2y$10$/rlWCJpoEyTmGjAFwd0bZu8fCRDecKdrEvPo3wXwrRirTcT0SgOw2', '1', '2023-03-14 14:09:00', '2024-02-12 06:18:42');
 
 -- --------------------------------------------------------
 
