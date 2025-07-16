@@ -2,9 +2,10 @@ from fastapi import FastAPI, HTTPException, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 # from rag.inference import generate_response
-from auth_utils import create_access_token
-import middleware as mw
-import db.database as db
+from rag.embedder import embedd_product_data
+from api.utils import create_access_token
+import api.middleware as mw
+import api.db.database as db
 from passlib.context import CryptContext
 
 app = FastAPI(
@@ -54,6 +55,11 @@ class QueryResponse(BaseModel):
     status_code: int
     message : str
     answer: str
+
+class EmbeddingResponse(BaseModel):
+    success: bool
+    status_code: int
+    message : str
 
 @app.get("/api/status", tags=["Status"])
 def status():
@@ -133,6 +139,15 @@ def login_admin(payload: LoginRequest):
 #     except Exception as e:
 #         print("[DEBUG] Query error :", str(e))
 #         raise HTTPException(status_code=500, detail=str(e))
+    
+@app.post("/api/embedd-products", response_model=EmbeddingResponse, tags=["Embedd Product Data"])
+def embedd_products(admin: dict = Depends(mw.admin_middleware)):
+    try:
+        embedd_product_data(db_conn)
+        return EmbeddingResponse(success=True, status_code=200, message="Successfully Embedd Product Data")
+    except Exception as e:
+        print("[DEBUG] Embedding error :", str(e))
+        raise HTTPException(status_code=500, detail=str(e))
 
 # ! uvicorn app.main:app --reload or run main.py
 if __name__ == "__main__":

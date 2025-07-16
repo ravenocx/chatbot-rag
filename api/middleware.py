@@ -1,6 +1,6 @@
 from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
-from auth_utils import verify_access_token
+from api.utils import verify_access_token
 
 security = HTTPBearer()
 

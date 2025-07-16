@@ -1,5 +1,5 @@
 from langchain.schema import Document
-import helpers.cleaning as c
+import rag.helpers.cleaning as c
 import json
 import locale
 

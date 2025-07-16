@@ -44,3 +44,11 @@ def create_user(db, name: str, email: str, phone_number:str, hashed_password:str
         return None
     finally:
         cursor.close()
+
+def get_rag_configuration(db):
+    cursor= db.cursor(dictionary=True)
+    cursor.execute("SELECT * FROM rag_configurations WHERE id = %s", (1,))
+    
+    rag_config = cursor.fetchone()
+    cursor.close()
+    return rag_config
