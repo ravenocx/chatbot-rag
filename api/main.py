@@ -23,14 +23,17 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-class QueryRequest(BaseModel):
-    query: str
+class RegisterRequest(BaseModel):
+    name: str
+    phone_number:str
+    email: str
+    password: str
 
-class QueryResponse(BaseModel):
+class RegisterResponse(BaseModel):
     success: bool
     status_code: int
     message : str
-    answer: str
+    access_token : str
 
 class LoginRequest(BaseModel):
     email: str
@@ -42,6 +45,15 @@ class LoginResponse(BaseModel):
     message : str
     access_token : str
 
+class QueryRequest(BaseModel):
+    query: str
+
+class QueryResponse(BaseModel):
+    success: bool
+    status_code: int
+    message : str
+    answer: str
+
 @app.get("/api/status", tags=["Status"])
 def status():
     return {
@@ -52,7 +64,31 @@ def status():
         "message": "Ready to process query."
     }
 
-@app.post("/api/login/user", tags=["User Login"])
+@app.post("/api/register/user",response_model=RegisterResponse, tags=["Register User"])
+def register_user(payload: RegisterRequest):
+    try:
+        conn = db.db_connection()
+
+        # Check if email already exists
+        existing_user = db.get_user(conn, payload.email)
+        if existing_user:
+            raise HTTPException(status_code=400, detail="Email already registered")
+
+        hashed_password = pwd_context.hash(payload.password)
+        user_id = db.create_user(conn, payload.name, payload.email, payload.phone_number, hashed_password)
+
+        if not user_id:
+            raise HTTPException(status_code=500, detail="Failed to register user")
+
+        token = create_access_token(user_id=user_id, role="customer")
+        return RegisterResponse(success=True, status_code=200, message="User registered successfully", access_token=token)
+    except HTTPException as e:
+        raise e
+    except Exception as e:
+        print("[DEBUG] User Register error :", str(e))
+        raise HTTPException(status_code=500, detail="Internal server error")
+
+@app.post("/api/login/user", response_model=LoginResponse, tags=["User Login"])
 def login_user(payload: LoginRequest):
     try : 
         conn = db.db_connection()
@@ -72,7 +108,7 @@ def login_user(payload: LoginRequest):
         print("[DEBUG] User Login error :", str(e))
         raise HTTPException(status_code=500, detail=str(e))
 
-@app.post("/api/login/admin", tags=["Admin Login"])
+@app.post("/api/login/admin", response_model=LoginResponse, tags=["Admin Login"])
 def login_admin(payload: LoginRequest):
     try :
         conn = db.db_connection()
