@@ -5,6 +5,9 @@ from sentence_transformers import SentenceTransformer
 import faiss
 import os
 
+tokenizer = AutoTokenizer.from_pretrained("BAAI/bge-m3")
+model = SentenceTransformer('BAAI/bge-m3')
+
 def embedd_product_data(db_conn): 
     products = db.get_all_products(db_conn)
     attributes = db.get_all_attributes(db_conn)
@@ -14,7 +17,6 @@ def embedd_product_data(db_conn):
     print(f"✅ Success Generated {len(documents)} documents")
 
     # Check if the document exceed token limit
-    tokenizer = AutoTokenizer.from_pretrained("BAAI/bge-m3")
     texts = [f"Passage: {doc.page_content}" for doc in documents]
 
     for i, text in enumerate(texts):
@@ -25,8 +27,6 @@ def embedd_product_data(db_conn):
             print(f"⚠️ Doc {i} Exceeds token limit! Token: ", len(tokens))
     
     # Embedd product data
-    model = SentenceTransformer('BAAI/bge-m3')
-
     embeddings = model.encode(
         texts,
         show_progress_bar=True,
